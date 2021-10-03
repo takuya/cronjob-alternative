@@ -1,0 +1,28 @@
+name: test src
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    env:
+      REPO_NAME: cronjob-alternative
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      
+      - name : prepare for build
+        shell: bash
+        run : |
+          cd ./src
+          composer install  -q --no-ansi --no-interaction --no-scripts --no-progress
+          composer dump-autoload
+      - name: artisan test
+        shell: bash
+        run : |
+          cd ./src
+          php artisan test
