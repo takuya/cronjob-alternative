@@ -7,7 +7,7 @@ on:
       - develop
 
 jobs:
-  build_and_push:
+  artisan_test:
     runs-on: ubuntu-latest
     env:
       REPO_NAME: cronjob-alternative
