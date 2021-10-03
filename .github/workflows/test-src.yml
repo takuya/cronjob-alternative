@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       REPO_NAME: cronjob-alternative
+      LANG: ja_JP.utf-8
     steps:
       - name: checkout
         uses: actions/checkout@v2
