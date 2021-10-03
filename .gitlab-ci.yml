@@ -1,0 +1,57 @@
+stages:
+  - test
+  - deploy
+
+
+
+before_script:
+  - echo before_script.
+
+depory_to_server:
+  stage: deploy
+  tags:
+    - takuya
+  script:
+    - echo Start Deploy
+    - |
+      mkdir -p ~/.ssh
+      chmod 700 ~/.ssh
+      touch ~/.ssh/known_hosts
+      echo "$HOST_KEY" > ~/.ssh/known_hosts
+      eval $(ssh-agent -s)
+      ssh-add <(echo "$MY_PRIVATE_KEY")
+      cat ~/.ssh/known_hosts
+      ssh $DEPLOY_SERVER  "
+      echo running on \$SHELL
+      echo start deploy
+      alias php=php7.4
+      alias php
+      cd $DEPLOY_PATH/src
+      pwd
+      git checkout composer.lock
+      git checkout -f public
+      git pull
+      php ./composer.phar self-update
+      php ./composer.phar update
+      php ./composer.phar install
+      php ./composer.phar dump-autoload
+      touch database/database.sqlite
+      sqlite3 database/database.sqlite 'VACUUM;'
+      cp .env .env.local
+      cp .env.prod .env
+      sed -i 's/APP_ENV=local/APP_ENV=prod/' .env
+      php  artisan storage:link
+      php  artisan migrate
+      php  artisan optimize
+      chmod g+rwx storage -R
+      npm i
+      npm run prod
+      cd ..
+      echo end"
+    - echo deploy latest
+  only:
+    - develop
+
+
+
+

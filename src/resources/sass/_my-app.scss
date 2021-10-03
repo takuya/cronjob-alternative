@@ -1,0 +1,34 @@
+
+.hover-row {
+
+  &:hover{
+    background-color: rgba(0,0,0,0.1);
+  }
+}
+
+.console {
+  color: #5cd08d;
+  background-color: #202326;
+  font-family: Consolas;
+  padding: 1rem;
+  font-size: .8rem;
+}
+.pre-line {
+  white-space: pre-line;
+}
+
+.pre-wrap {
+  white-space: pre-wrap;
+}
+
+.text-del{
+  text-decoration: line-through;
+}
+
+.v-enter-active{
+  transition: opacity .4s;
+}
+
+.v-enter{
+  opacity: 0;
+}

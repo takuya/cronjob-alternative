@@ -1,0 +1,171 @@
+_composer()
+{
+    local cur script coms opts com
+    COMPREPLY=()
+    _get_comp_words_by_ref -n : cur words
+
+    # for an alias, get the real script behind it
+    if [[ $(type -t ${words[0]}) == "alias" ]]; then
+        script=$(alias ${words[0]} | sed -E "s/alias ${words[0]}='(.*)'/\1/")
+    else
+        script=${words[0]}
+    fi
+
+    # lookup for command
+    for word in ${words[@]:1}; do
+        if [[ $word != -* ]]; then
+            com=$word
+            break
+        fi
+    done
+
+    # completing for an option
+    if [[ ${cur} == --* ]] ; then
+        opts="--help --quiet --verbose --version --ansi --no-ansi --no-interaction --profile --no-plugins --working-dir --no-cache"
+
+        case "$com" in
+
+            about)
+            opts="${opts} "
+            ;;
+
+            archive)
+            opts="${opts} --format --dir --file --ignore-filters"
+            ;;
+
+            browse)
+            opts="${opts} --homepage --show"
+            ;;
+
+            check-platform-reqs)
+            opts="${opts} --no-dev --lock"
+            ;;
+
+            clear-cache)
+            opts="${opts} "
+            ;;
+
+            config)
+            opts="${opts} --global --editor --auth --unset --list --file --absolute --json --merge --append"
+            ;;
+
+            create-project)
+            opts="${opts} --stability --prefer-source --prefer-dist --prefer-install --repository --repository-url --add-repository --dev --no-dev --no-custom-installers --no-scripts --no-progress --no-secure-http --keep-vcs --remove-vcs --no-install --ignore-platform-req --ignore-platform-reqs --ask"
+            ;;
+
+            depends)
+            opts="${opts} --recursive --tree"
+            ;;
+
+            diagnose)
+            opts="${opts} "
+            ;;
+
+            dump-autoload)
+            opts="${opts} --no-scripts --optimize --classmap-authoritative --apcu --apcu-prefix --dev --no-dev --ignore-platform-req --ignore-platform-reqs"
+            ;;
+
+            exec)
+            opts="${opts} --list"
+            ;;
+
+            fund)
+            opts="${opts} --format"
+            ;;
+
+            global)
+            opts="${opts} "
+            ;;
+
+            help)
+            opts="${opts} --xml --format --raw"
+            ;;
+
+            init)
+            opts="${opts} --name --description --author --type --homepage --require --require-dev --stability --license --repository --autoload"
+            ;;
+
+            install)
+            opts="${opts} --prefer-source --prefer-dist --prefer-install --dry-run --dev --no-suggest --no-dev --no-autoloader --no-scripts --no-progress --no-install --optimize-autoloader --classmap-authoritative --apcu-autoloader --apcu-autoloader-prefix --ignore-platform-req --ignore-platform-reqs"
+            ;;
+
+            licenses)
+            opts="${opts} --format --no-dev"
+            ;;
+
+            list)
+            opts="${opts} --xml --raw --format"
+            ;;
+
+            outdated)
+            opts="${opts} --outdated --all --locked --direct --strict --minor-only --format --ignore --no-dev"
+            ;;
+
+            prohibits)
+            opts="${opts} --recursive --tree"
+            ;;
+
+            reinstall)
+            opts="${opts} --prefer-source --prefer-dist --prefer-install --no-autoloader --no-scripts --no-progress --optimize-autoloader --classmap-authoritative --apcu-autoloader --apcu-autoloader-prefix --ignore-platform-req --ignore-platform-reqs"
+            ;;
+
+            remove)
+            opts="${opts} --dev --dry-run --no-progress --no-update --no-install --no-scripts --update-no-dev --update-with-dependencies --update-with-all-dependencies --with-all-dependencies --no-update-with-dependencies --unused --ignore-platform-req --ignore-platform-reqs --optimize-autoloader --classmap-authoritative --apcu-autoloader --apcu-autoloader-prefix"
+            ;;
+
+            require)
+            opts="${opts} --dev --dry-run --prefer-source --prefer-dist --prefer-install --fixed --no-suggest --no-progress --no-update --no-install --no-scripts --update-no-dev --update-with-dependencies --update-with-all-dependencies --with-dependencies --with-all-dependencies --ignore-platform-req --ignore-platform-reqs --prefer-stable --prefer-lowest --sort-packages --optimize-autoloader --classmap-authoritative --apcu-autoloader --apcu-autoloader-prefix"
+            ;;
+
+            run-script)
+            opts="${opts} --timeout --dev --no-dev --list"
+            ;;
+
+            search)
+            opts="${opts} --only-name --type --format"
+            ;;
+
+            self-update)
+            opts="${opts} --rollback --clean-backups --no-progress --update-keys --stable --preview --snapshot --1 --2 --set-channel-only"
+            ;;
+
+            show)
+            opts="${opts} --all --locked --installed --platform --available --self --name-only --path --tree --latest --outdated --ignore --minor-only --direct --strict --format --no-dev"
+            ;;
+
+            status)
+            opts="${opts} "
+            ;;
+
+            suggests)
+            opts="${opts} --by-package --by-suggestion --all --list --no-dev"
+            ;;
+
+            update)
+            opts="${opts} --with --prefer-source --prefer-dist --prefer-install --dry-run --dev --no-dev --lock --no-install --no-autoloader --no-scripts --no-suggest --no-progress --with-dependencies --with-all-dependencies --optimize-autoloader --classmap-authoritative --apcu-autoloader --apcu-autoloader-prefix --ignore-platform-req --ignore-platform-reqs --prefer-stable --prefer-lowest --interactive --root-reqs"
+            ;;
+
+            validate)
+            opts="${opts} --no-check-all --no-check-lock --no-check-publish --no-check-version --with-dependencies --strict"
+            ;;
+
+        esac
+
+        COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+        __ltrim_colon_completions "$cur"
+
+        return 0;
+    fi
+
+    # completing for a command
+    if [[ $cur == $com ]]; then
+        coms="about archive browse check-platform-reqs clear-cache config create-project depends diagnose dump-autoload exec fund global help init install licenses list outdated prohibits reinstall remove require run-script search self-update show status suggests update validate"
+
+        COMPREPLY=($(compgen -W "${coms}" -- ${cur}))
+        __ltrim_colon_completions "$cur"
+
+        return 0
+    fi
+}
+
+complete -o default -F _composer composer

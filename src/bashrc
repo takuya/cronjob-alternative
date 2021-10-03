@@ -1,0 +1,209 @@
+if ! type php  >/dev/null  2>&1 ; then
+  echo 'php-cli がないので動かない。'
+  return
+fi
+## パスを揃える
+if [[ -d  ${BASH_SOURCE[0]%/*} ]] ;then
+  cd ${BASH_SOURCE[0]%/*}
+fi
+
+function mac_php73issue(){
+  ## php の user.ini を読み込ませる
+  if [[ $(uname -a) =~ Mac && $( php -v ) =~ 7\.3\.* ]];  then
+    echo set PHP_INI_SCAN_DIR for php7.3 regrex issue.
+    export PHP_INI_SCAN_DIR=.
+  fi
+  unset "${FUNCNAME[0]}";
+}
+
+function sample() { echo $0; }
+
+
+function get_composer(){
+  function composer_download(){
+    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+    #php -r "if (hash_file('sha384', 'composer-setup.php') === 'a5c698ffe4b8e849a443b120cd5ba38043260d5c4023dbf93e1558871f1f07f58274fc6f4c93bcfd858c6bd0775cd8d1') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+    php composer-setup.php
+    php -r "unlink('composer-setup.php');"
+    unset "${FUNCNAME[0]}";
+  }
+  function composer_setJPMirror(){
+    composer config repositories.packagist composer https://packagist.jp
+    composer update
+    composer install
+    unset ${FUNCNAME[0]} ;
+  }
+
+  if [[ ! -x ./composer.phar ]] ; then
+    composer_download
+  fi
+  # alias_composer
+  if  ! alias  composer  > /dev/null 2>&1 ; then
+    alias composer='php -d xdebug.remote_autostart=0  -d xdebug.remote_enable=0 ./composer.phar '
+  fi
+  # if [[ !  $(cat composer.json ) =~ /packagist.jp/ ]]; then
+  #   composer_setJPMirror
+  # fi
+
+  #
+  unset "${FUNCNAME[0]}";
+}
+
+function reset_cache(){
+  ## reset cache
+  php artisan route:clear
+  php artisan cache:clear
+  php artisan clear-compiled
+  php artisan optimize:clear
+  php artisan view:clear
+  php artisan config:clear
+  unset "${FUNCNAME[0]}";
+}
+function bash_completion_for_artisan(){
+  if [[ ! -e vendor/balping/artisan-bash-completion/artisan ]] ; then
+    echo Install artisan bash completion
+    composer require --dev balping/artisan-bash-completion
+    composer dumpautoload
+  fi
+  source vendor/balping/artisan-bash-completion/artisan
+
+  unset "${FUNCNAME[0]}";
+}
+
+function laravel_init_env(){
+  echo laravel .env generation
+  cp ./.env.example ./.env
+  echo laravel crypt key generation
+  php artisan key:generate
+  unset "${FUNCNAME[0]}";
+}
+
+function laravel_init_sqlite(){
+  if [[ -e .env &&  ! -e ./database/database.sqlite ]] ; then
+    echo set .env to use sqlite
+    sed -i  's/^DB_/#DB_/g' .env
+    sed -i  '10iDB_CONNECTION=sqlite'  .env
+    echo init database
+    touch database/database.sqlite
+    touch ./database/database.sqlite
+    php artisan migrate:fresh --seed
+  fi
+}
+function laravel_ide_completion(){
+  echo set IDE completion
+  if [[ ! -e vendor/barryvdh/laravel-ide-helper ]] ; then
+    echo install Laravel IDE Completion
+    composer require --dev barryvdh/laravel-ide-helper
+  fi
+  php artisan ide-helper:models --write
+  php artisan ide-helper:generate
+
+}
+function bash_composer_completion(){
+  echo set composer relative
+  [[ ! -e ./vendor/bin/symfony-autocomplete  ]] &&  composer require --dev bamarni/symfony-console-autocomplete
+  [[ ! -e  ./composer.bash.completion ]] && ./vendor/bin/symfony-autocomplete composer > ./composer.bash.completion
+  [[ -e  ./composer.bash.completion ]] &&  source ./composer.bash.completion
+}
+
+
+function macos_php(){
+  bin_dir=$(dirname $(readlink -f ${BASH_ARGV[0]} ))/.bin;
+  php74=/usr/local/opt/php@7.4/bin/php
+  pecl74=$(dirname $php74)/pecl
+
+  php=$php74
+  pecl=$pecl74
+  if [[ ! -e $php ]];then
+    brew install 'php@7.4'
+  fi
+  if [[ ! -d $bin_dir ]] ; then
+    mkdir "$bin_dir";
+  fi
+  if [[ ! -e $bin_dir/php ]] ; then
+    ln -sr $php $bin_dir
+  fi
+  if [[ ! -e $bin_dir/pecl ]] ; then
+    ln -sr $pecl $bin_dir
+  fi
+
+
+  if ! echo -e ${PATH//:/'\n'} | grep $bin_dir > /dev/null 2>/dev/null ; then
+    export PATH=$bin_dir:$PATH;
+  fi
+
+
+}
+function platform_depens(){
+  if [[ $(uname) =~ Darwin ]]; then
+    echo macos
+    #mac_php73issue
+    macos_php;
+  fi
+
+}
+
+## mac の homebrew の問題
+platform_depens
+
+## composer
+get_composer
+composer dump-autoload
+
+## alias artisan
+alias artisan='php artisan'
+
+## artisan completion
+bash_completion_for_artisan
+
+## laravel .env generation
+if [[ ! -e ./.env ]] ; then
+  laravel_init_env
+fi
+
+## prepare database file
+## artisan migrate でも作成されるけどね
+laravel_init_sqlite
+
+## JetBrains auto complete
+laravel_ide_completion
+
+## storage link を相対パスで。
+if [[ ! -e public/storage ]];then
+  ## storage link は絶対パスでいくので困るんですね。
+  echo Linking storage / artisan storage:link
+  cd public
+  ln -s ../storage/app/public storage
+  cd -
+fi
+
+## phpunit でぱぱっと実行
+echo set phpunit
+alias run-test='phpunit  --no-configuration --no-extensions --no-logging --debug '
+alias phpunit='./vendor/bin/phpunit'
+
+
+## composer completion
+bash_composer_completion
+
+
+## debug server info
+[[ ! -e  .php.user.ini ]] && touch .php.user.ini
+alias server-debug='php -c .php.user.ini -S localhost:8000 -t public'
+
+
+## reset config
+reset_cache
+
+## make auth
+# composer require laravel/ui
+# php artisan ui vue --auth
+
+
+## npm i first
+if [[ ! -e ./package-lock.json ]]; then
+  npm i
+  npm run dev
+fi
+
+
