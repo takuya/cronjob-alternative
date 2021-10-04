@@ -1,5 +1,7 @@
 ## Cron Job Alternative
 
+![Actions Status](https://github.com/takuya/cronjob-alternative/workflows/test%20src/badge.svg)
+
 CRONと同等の処理を、webから管理する
 
 Linuxのcrontabの定期実行の不便さを解消したい。
