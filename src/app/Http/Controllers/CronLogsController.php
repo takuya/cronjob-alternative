@@ -30,6 +30,9 @@ class CronLogsController extends Controller {
     
     
     if( $pid == $log->pid ) {
+      if (defined('SIGHUP')){
+        define( 'SIGHUP', 1);
+      }
       $ret = posix_kill($log->pid, SIGHUP);
       
       return ['success' => true];
