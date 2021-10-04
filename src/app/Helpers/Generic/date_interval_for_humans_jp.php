@@ -9,7 +9,7 @@ if ( !function_exists( 'date_interval_for_humans_jp' ) ) {
    * @param float $seconds_interval
    */
   function date_interval_for_humans_jp ( $seconds_interval ) {
-    return CarbonInterval::create( '0s' )
+    return CarbonInterval::create( '0' )
                          ->locale( "ja_JP" )
                          ->addSeconds( $seconds_interval )
                          ->cascade()
