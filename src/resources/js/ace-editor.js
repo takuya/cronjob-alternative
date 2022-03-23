@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
   editor.setTheme("ace/theme/chrome");
   editor.getSession().setUseWrapMode(true);
   editor.getSession().setTabSize(2);
+  editor.getSession().setNewLineMode('unix')
   editor.setFontSize('1.2em');
   editor.setOptions({
     enableBasicAutocompletion: true
