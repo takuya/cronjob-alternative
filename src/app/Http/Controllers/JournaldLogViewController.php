@@ -7,7 +7,11 @@ use Symfony\Component\Process\Process;
 class JournaldLogViewController extends Controller {
   
   public function show() {
-    
+    /**
+     * This need 'adm' permission.
+     * preparing adm group php-fpm.
+     * $ usermod -aG adm www-data
+     */
     
     $service_name = 'cron-laravel';
     $from = strftime("%Y-%m-%d %H:%M:%S", strtotime('-2 days'));
