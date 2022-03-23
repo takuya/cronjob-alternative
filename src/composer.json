@@ -1,12 +1,13 @@
   {
-  "name": "laravel/laravel",
+  "name": "takuya/cron-laravel",
   "type": "project",
-  "description": "The Laravel Framework.",
+  "description": "Cron Job Alternatives by laravel",
   "keywords": [
-    "framework",
+    "cron",
+    "cron-job",
     "laravel"
   ],
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "require": {
     "php": "^7.3|^8.0",
     "ext-json": "*",
