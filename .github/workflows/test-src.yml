@@ -20,6 +20,7 @@ jobs:
         shell: bash
         run : |
           cd ./src
+          composer update
           composer install  -q --no-ansi --no-interaction --no-scripts --no-progress
           composer dump-autoload
           npm i

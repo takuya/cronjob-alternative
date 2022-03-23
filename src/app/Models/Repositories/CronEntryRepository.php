@@ -19,12 +19,14 @@ class CronEntryRepository {
   }
   
   public static function nextDueDate(string $cron_expression, $timezone){
+    $timezone = is_string($timezone) ? new \DateTimeZone($timezone) : $timezone;
     return (new CronExpression( $cron_expression ))
       ->getNextRunDate( Carbon::now()->setTimezone( config( 'app.timezone' ) ) )
       ->setTimezone( $timezone )
       ->format( 'Y-m-d H:i:s P' );
   }
   public static function lastDueDate(string $cron_expression, $timezone){
+    $timezone = is_string($timezone) ? new \DateTimeZone($timezone) : $timezone;
     return (new CronExpression( $cron_expression ))
       ->getPreviousRunDate( Carbon::now()->setTimezone( config( 'app.timezone' ) ) )
       ->setTimezone( $timezone )

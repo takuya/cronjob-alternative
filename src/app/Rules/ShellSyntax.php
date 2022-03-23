@@ -9,6 +9,8 @@ use App\Services\SyntaxCheck\Exceptions\ShellSyntaxError;
 class ShellSyntax implements Rule {
   
   protected $shell;
+  /** @var ShellSyntaxError */
+  protected $ex;
   
   public function __construct( $shell ) {
     $this->shell = $shell;
@@ -24,6 +26,7 @@ class ShellSyntax implements Rule {
     try {
       SyntaxCheckService::validate($value, $this->shell);
     } catch (ShellSyntaxError $ex) {
+      $this->ex = $ex;
       return false;
     }
     
@@ -35,6 +38,7 @@ class ShellSyntax implements Rule {
    * @return string
    */
   public function message() {
-    return $this->shell.' syntax Error.';
+    $msg =  $this->shell." syntax Error. ( {$this->ex->getMessage()} )";
+    return $msg;
   }
 }
