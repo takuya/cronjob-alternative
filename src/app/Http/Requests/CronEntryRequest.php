@@ -8,6 +8,7 @@ use App\Rules\ShellInputRule;
 use App\Rules\CronExpressionRule;
 use App\Rules\PosixUserExistsRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Arr;
 
 class CronEntryRequest extends FormRequest {
   
@@ -31,8 +32,21 @@ class CronEntryRequest extends FormRequest {
       $params['env'] = json_decode($params['env']);
     }
     $params['command'] = Str::of($params['command'])->split('/\r\n/')->join("\n");
-    
     return $params;
+  }
+  
+  protected function prepareForValidation () {
+    $this->preventCRLF( 'shell', 'body' );
+  }
+  
+  protected function preventCRLF ( ...$keys ) {
+    $param = $this->input();
+    $key_with_dot = join( '.', $keys );
+    $val = $this->input( $key_with_dot );
+    $val = preg_replace( "|\r\n|", "\n", $val, -1 );
+    // Arr::undot
+    Arr::set( $param, $key_with_dot, $val );
+    $this->merge( $param );
   }
   
   /**
