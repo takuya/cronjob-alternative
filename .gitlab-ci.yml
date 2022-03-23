@@ -24,7 +24,7 @@ depory_to_server:
       ssh $DEPLOY_SERVER  "
       echo running on \$SHELL
       echo start deploy
-      alias php=php7.4
+      alias php=php8.0
       alias php
       cd $DEPLOY_PATH/src
       pwd

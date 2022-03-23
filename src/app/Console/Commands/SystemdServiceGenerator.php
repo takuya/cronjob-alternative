@@ -12,7 +12,7 @@ class SystemdServiceGenerator extends Command {
    *
    * @var string
    */
-  protected $signature = 'schedule:systemd_generate  {output=php://stdout} {--php=7.4}';
+  protected $signature = 'schedule:systemd_generate  {output=php://stdout} {--php=8.0}';
   /**
    * The console command description.
    *

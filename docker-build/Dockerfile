@@ -1,5 +1,5 @@
 
-FROM php:7.4-fpm
+FROM php:8.0-fpm
 
 RUN  echo "APT::Install-Suggests 0;"   >> /etc/apt/apt.conf.d/00-no-install-recommends ;\
      echo "APT::Install-Recommends 0;" >> /etc/apt/apt.conf.d/00-no-install-recommends ;\
