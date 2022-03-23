@@ -109,5 +109,10 @@ class CronEntry extends Model {
            ->get();
     return $logs;
   }
+  public function logs(){
+    return CronLog::where('cron_entry', 'like', "%\"id\":{$this->id}%")
+      ->where('name', $this->name)
+      ->orderBy('updated_at', 'desc');
+  }
   
 }
