@@ -249,6 +249,16 @@
                 </div>
               </li>
             @endforeach
+              <li class="list-group-item">
+                <div class="row justify-content-center">
+                  <div class="col-12 col-md-auto">
+                    <!-- Button trigger modal -->
+                    <div class="w-100 btn">
+                      <a href="{{route('user.logs.index',['cron_entry_id'=>$entry->id] )}}">show all log</a>
+                    </div>
+                  </div>
+                </div>
+              </li>
           </ul>
         </div>
       </div>

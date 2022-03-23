@@ -9,6 +9,22 @@
 @section('plugins.Datatables', true)
 
 @section('content')
+  @if ( request()->query('cron_entry_id') )
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          Filter
+        </div>
+        <div class="card-body">
+            <a href="{{ route('user.logs.index') }}" class="btn btn-outline-primary text-decoration-none">
+              <i class='hover text-black fas fa-1x fa-window-close'></i>
+              Cron={{request()->query('cron_entry_id')}}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  @endif
 
   <div class="row">
     <div class="col-12">

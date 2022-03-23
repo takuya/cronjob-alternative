@@ -5,15 +5,20 @@ namespace App\Http\Controllers;
 use RuntimeException;
 use App\Models\CronLog;
 use App\Models\CronEntry;
+use Illuminate\Http\Request;
 
 class CronLogsController extends Controller {
   
-  public function index() {
+  public function index( Request $req) {
+    $cron_entry_id = $req->query('cron_entry_id');
+    if ($cron_entry_id){
+      $entries = CronEntry::findOrFail($cron_entry_id)->logs()->paginate(100);
+    }else{
+      $entries = CronLog::orderBy('updated_at', 'desc')->paginate(100);
+    }
     
-    $entries = CronLog::orderBy('updated_at', 'desc')->paginate(100);
     
-    //$headers = ['id','name','exit_status_code','created_at'];
-    return view('cron_logs.index', ['entries' => $entries]);
+    return view('cron_logs.index', ['entries' => $entries->appends($req->input())]);
   }
   
   public function show_with_entry( CronEntry $cron, CronLog $log ) {
