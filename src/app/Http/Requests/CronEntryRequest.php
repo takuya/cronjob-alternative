@@ -20,10 +20,10 @@ class CronEntryRequest extends FormRequest {
   }
   
   public function validated() {
-    return $this->toCronEntryFilleArray();
+    return $this->toCronEntryFilledArray();
   }
   
-  public function toCronEntryFilleArray() {
+  public function toCronEntryFilledArray() {
     $params = parent::validated();
     $params['command'] = $params['shell']['body'];
     $params['shell'] = $params['shell']['cmd'];
